@@ -1,0 +1,22 @@
+{% extends "fefu_lab/base.html" %}
+
+{% block title %}Главная страница{% endblock %}
+{% block heading %}Добро пожаловать на главную страницу!{% endblock %}
+
+{% block content %}
+<div class="welcome-content">
+    <p>Это простое Django-приложение для лабораторной работы №2.</p>
+    <p>Теперь с шаблонами, формами и статическими файлами!</p>
+    
+    <div style="margin-top: 20px;">
+        <h3>Доступные страницы:</h3>
+        <ul>
+            <li><a href="{% url 'about' %}">О нас</a> - информация о проекте</li>
+            <li><a href="{% url 'feedback' %}">Обратная связь</a> - форма для связи</li>
+            <li><a href="{% url 'register' %}">Регистрация</a> - создание аккаунта</li>
+            <li><a href="{% url 'student' student_id=1 %}">Профиль студента</a> - пример студента</li>
+            <li><a href="{% url 'course' course_slug='python-basics' %}">Курс Python</a> - информация о курсе</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

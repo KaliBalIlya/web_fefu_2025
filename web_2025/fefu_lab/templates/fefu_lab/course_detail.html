@@ -1,0 +1,23 @@
+{% extends "fefu_lab/base.html" %}
+
+{% block title %}Курс {{ course_slug }}{% endblock %}
+{% block heading %}Курс: {{ course_name }}{% endblock %}
+
+{% block content %}
+<div class="course-info">
+    <p><strong>Название:</strong> {{ course_name }}</p>
+    <p><strong>Продолжительность:</strong> {{ duration }} часов</p>
+    <p><strong>Уровень:</strong> {{ level }}</p>
+    <p><strong>Преподаватель:</strong> {{ instructor }}</p>
+    <p><strong>Описание:</strong> {{ description }}</p>
+</div>
+
+<div style="margin-top: 20px;">
+    <h3>Другие курсы:</h3>
+    <ul>
+        <li><a href="{% url 'course' course_slug='python-basics' %}">Основы Python</a></li>
+        <li><a href="{% url 'course' course_slug='web-security' %}">Веб-безопасность</a></li>
+        <li><a href="{% url 'course' course_slug='network-defense' %}">Защита сетей</a></li>
+    </ul>
+</div>
+{% endblock %}
