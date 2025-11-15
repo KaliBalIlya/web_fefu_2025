@@ -1,7 +1,8 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from .models import UserProfile
+from .models import Student, Course, Enrollment
 
+# ---------- Существующие формы из Lab 2 ----------
 class FeedbackForm(forms.Form):
     name = forms.CharField(
         max_length=100,
@@ -38,7 +39,8 @@ class FeedbackForm(forms.Form):
             raise ValidationError("Сообщение должно содержать минимум 10 символов")
         return message.strip()
 
-class RegistrationForm(forms.Form):
+# Старая форма регистрации (из Lab 2) - можно удалить или оставить для обратной совместимости
+class OldRegistrationForm(forms.Form):
     username = forms.CharField(
         max_length=50,
         label='Логин',
@@ -63,14 +65,12 @@ class RegistrationForm(forms.Form):
 
     def clean_username(self):
         username = self.cleaned_data['username']
-        if UserProfile.objects.filter(username=username).exists():
-            raise ValidationError("Пользователь с таким логином уже существует")
+        # Убрана проверка на UserProfile, так как эта модель больше не используется
         return username
 
     def clean_email(self):
         email = self.cleaned_data['email']
-        if UserProfile.objects.filter(email=email).exists():
-            raise ValidationError("Пользователь с таким email уже существует")
+        # Убрана проверка на UserProfile, так как эта модель больше не используется
         return email
 
     def clean_password(self):
@@ -88,3 +88,54 @@ class RegistrationForm(forms.Form):
             raise ValidationError("Пароли не совпадают")
         
         return cleaned_data
+
+# ---------- Новые формы для Lab 3 ----------
+class StudentRegistrationForm(forms.ModelForm):
+    password_confirm = forms.CharField(
+        label='Подтверждение пароля',
+        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
+        error_messages={'required': 'Поле "Подтверждение пароля" обязательно для заполнения'}
+    )
+
+    class Meta:
+        model = Student
+        fields = ['first_name', 'last_name', 'email', 'birth_date', 'faculty']
+        widgets = {
+            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'birth_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'faculty': forms.Select(attrs={'class': 'form-control'}),
+        }
+        error_messages = {
+            'email': {
+                'unique': 'Пользователь с таким email уже существует',
+            }
+        }
+
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        if Student.objects.filter(email=email).exists():
+            raise ValidationError("Пользователь с таким email уже существует")
+        return email
+
+    def clean(self):
+        cleaned_data = super().clean()
+        # Дополнительные проверки могут быть добавлены здесь
+        return cleaned_data
+
+class EnrollmentForm(forms.ModelForm):
+    class Meta:
+        model = Enrollment
+        fields = ['course']
+        widgets = {
+            'course': forms.Select(attrs={'class': 'form-control'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['course'].queryset = Course.objects.filter(is_active=True)
+
+# Альтернативно: если хотите использовать обе формы регистрации,
+# можно создать алиас для обратной совместимости
+RegistrationForm = StudentRegistrationForm

@@ -12,10 +12,11 @@
         <nav class="navigation">
             <a href="{% url 'home' %}">Главная</a> | 
             <a href="{% url 'about' %}">О нас</a> | 
+            <a href="{% url 'student_list' %}">Студенты</a> | 
+            <a href="{% url 'course_list' %}">Курсы</a> | 
             <a href="{% url 'feedback' %}">Обратная связь</a> | 
             <a href="{% url 'register' %}">Регистрация</a> |
-            <a href="{% url 'student' student_id=1 %}">Пример студента</a> |
-            <a href="{% url 'course' course_slug='python-basics' %}">Курс Python</a>
+            <a href="{% url 'enrollment' %}">Запись на курс</a>
         </nav>
         
         <main>

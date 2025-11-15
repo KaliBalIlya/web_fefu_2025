@@ -1,0 +1,42 @@
+{% extends "fefu_lab/base.html" %}
+
+{% block title %}Профиль студента - {{ student.full_name }}{% endblock %}
+{% block heading %}Профиль студента: {{ student.full_name }}{% endblock %}
+
+{% block content %}
+<div class="student-info">
+    <div class="info-section">
+        <h3>Основная информация</h3>
+        <p><strong>Имя:</strong> {{ student.first_name }}</p>
+        <p><strong>Фамилия:</strong> {{ student.last_name }}</p>
+        <p><strong>Email:</strong> {{ student.email }}</p>
+        <p><strong>Факультет:</strong> {{ student.get_faculty_display }}</p>
+        {% if student.birth_date %}
+        <p><strong>Дата рождения:</strong> {{ student.birth_date }}</p>
+        {% endif %}
+        <p><strong>Статус:</strong> {% if student.is_active %}Активен{% else %}Неактивен{% endif %}</p>
+    </div>
+
+    {% if enrollments %}
+    <div class="info-section">
+        <h3>Записи на курсы</h3>
+        <div class="enrollments-list">
+            {% for enrollment in enrollments %}
+            <div class="enrollment-item">
+                <h4>{{ enrollment.course.title }}</h4>
+                <p><strong>Статус:</strong> {{ enrollment.get_status_display }}</p>
+                <p><strong>Дата записи:</strong> {{ enrollment.enrolled_at|date:"d.m.Y" }}</p>
+                {% if enrollment.grade %}
+                <p><strong>Оценка:</strong> {{ enrollment.grade }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<div class="navigation-links">
+    <a href="{% url 'student_list' %}">← Назад к списку студентов</a>
+</div>
+{% endblock %}

@@ -1,23 +1,63 @@
 {% extends "fefu_lab/base.html" %}
 
-{% block title %}Курс {{ course_slug }}{% endblock %}
-{% block heading %}Курс: {{ course_name }}{% endblock %}
+{% block title %}{{ course.title }}{% endblock %}
+{% block heading %}{{ course.title }}{% endblock %}
 
 {% block content %}
-<div class="course-info">
-    <p><strong>Название:</strong> {{ course_name }}</p>
-    <p><strong>Продолжительность:</strong> {{ duration }} часов</p>
-    <p><strong>Уровень:</strong> {{ level }}</p>
-    <p><strong>Преподаватель:</strong> {{ instructor }}</p>
-    <p><strong>Описание:</strong> {{ description }}</p>
-</div>
+<div class="course-detail">
+    <div class="course-info">
+        <div class="info-section">
+            <h3>Описание курса</h3>
+            <p>{{ course.description|linebreaks }}</p>
+        </div>
 
-<div style="margin-top: 20px;">
-    <h3>Другие курсы:</h3>
-    <ul>
-        <li><a href="{% url 'course' course_slug='python-basics' %}">Основы Python</a></li>
-        <li><a href="{% url 'course' course_slug='web-security' %}">Веб-безопасность</a></li>
-        <li><a href="{% url 'course' course_slug='network-defense' %}">Защита сетей</a></li>
-    </ul>
+        <div class="info-section">
+            <h3>Детали курса</h3>
+            <p><strong>Преподаватель:</strong> 
+                {% if course.instructor %}
+                    {{ course.instructor.full_name }}
+                {% else %}
+                    Не назначен
+                {% endif %}
+            </p>
+            <p><strong>Продолжительность:</strong> {{ course.duration }} часов</p>
+            <p><strong>Уровень:</strong> {{ course.get_level_display }}</p>
+            <p><strong>Максимум студентов:</strong> {{ course.max_students }}</p>
+            <p><strong>Записалось:</strong> {{ course.enrolled_students_count }} студентов</p>
+            <p><strong>Доступно мест:</strong> {{ available_slots }}</p>
+            <p><strong>Стоимость:</strong> 
+                {% if course.price > 0 %}
+                    {{ course.price }} руб.
+                {% else %}
+                    Бесплатно
+                {% endif %}
+            </p>
+        </div>
+
+        {% if enrollments %}
+        <div class="info-section">
+            <h3>Записанные студенты</h3>
+            <div class="enrolled-students">
+                {% for enrollment in enrollments %}
+                <div class="student-item">
+                    <strong>{{ enrollment.student.full_name }}</strong>
+                    <span class="status-badge {{ enrollment.status|lower }}">
+                        {{ enrollment.get_status_display }}
+                    </span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="course-actions">
+        {% if course.is_available %}
+        <a href="{% url 'enrollment' %}" class="btn btn-primary btn-large">Записаться на курс</a>
+        {% else %}
+        <span class="btn btn-disabled btn-large">Нет свободных мест</span>
+        {% endif %}
+        <a href="{% url 'course_list' %}" class="btn btn-secondary">← Назад к списку курсов</a>
+    </div>
 </div>
 {% endblock %}
