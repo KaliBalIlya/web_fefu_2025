@@ -1,0 +1,89 @@
+{% extends "fefu_lab/base.html" %}
+
+{% block title %}Профиль пользователя{% endblock %}
+{% block heading %}Мой профиль{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <div class="profile-header">
+        <div class="profile-avatar">
+            {% if user.profile.avatar %}
+                <img src="{{ user.profile.avatar.url }}" alt="Аватар" class="avatar">
+            {% else %}
+                <div class="avatar-placeholder">{{ user.first_name|first }}{{ user.last_name|first }}</div>
+            {% endif %}
+        </div>
+        <div class="profile-info">
+            <h2>{{ user.get_full_name }}</h2>
+            <p class="role-badge {{ user.profile.role|lower }}">{{ user.profile.get_role_display }}</p>
+            <p><strong>Email:</strong> {{ user.email }}</p>
+            {% if user.profile.phone %}
+                <p><strong>Телефон:</strong> {{ user.profile.phone }}</p>
+            {% endif %}
+            <a href="{% url 'profile_edit' %}" class="btn btn-primary">Редактировать профиль</a>
+        </div>
+    </div>
+
+    <div class="profile-details">
+        {% if user.profile.role == 'STUDENT' and student %}
+            <div class="detail-section">
+                <h3>Информация о студенте</h3>
+                <p><strong>Факультет:</strong> {{ student.get_faculty_display }}</p>
+                {% if student.birth_date %}
+                    <p><strong>Дата рождения:</strong> {{ student.birth_date }}</p>
+                {% endif %}
+                {% if student.student_id %}
+                    <p><strong>Студенческий билет:</strong> {{ student.student_id }}</p>
+                {% endif %}
+            </div>
+
+            <div class="detail-section">
+                <h3>Мои курсы</h3>
+                {% if enrollments %}
+                    <div class="enrollments-list">
+                        {% for enrollment in enrollments %}
+                            <div class="enrollment-item">
+                                <h4>{{ enrollment.course.title }}</h4>
+                                <p><strong>Статус:</strong> {{ enrollment.get_status_display }}</p>
+                                <p><strong>Дата записи:</strong> {{ enrollment.enrolled_at|date:"d.m.Y" }}</p>
+                                {% if enrollment.grade %}
+                                    <p><strong>Оценка:</strong> {{ enrollment.grade }}</p>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p>Вы еще не записаны на курсы.</p>
+                {% endif %}
+            </div>
+
+        {% elif user.profile.role == 'TEACHER' and instructor %}
+            <div class="detail-section">
+                <h3>Информация о преподавателе</h3>
+                <p><strong>Специализация:</strong> {{ instructor.specialization }}</p>
+                {% if instructor.degree %}
+                    <p><strong>Ученая степень:</strong> {{ instructor.degree }}</p>
+                {% endif %}
+                {% if instructor.office %}
+                    <p><strong>Кабинет:</strong> {{ instructor.office }}</p>
+                {% endif %}
+            </div>
+
+        {% elif user.profile.role == 'ADMIN' %}
+            <div class="detail-section">
+                <h3>Панель администратора</h3>
+                <p>У вас есть доступ к административной панели Django.</p>
+                <a href="/admin/" class="btn btn-warning">Админ-панель Django</a>
+                <a href="{% url 'admin_dashboard' %}" class="btn btn-primary">Дашборд администратора</a>
+            </div>
+        {% endif %}
+
+        {% if user.profile.bio %}
+            <div class="detail-section">
+                <h3>О себе</h3>
+                <p>{{ user.profile.bio|linebreaks }}</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends "fefu_lab/base.html" %}
+
+{% block title %}Дашборд студента{% endblock %}
+{% block heading %}Личный кабинет студента{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="dashboard-stats">
+        <div class="stat-card">
+            <h3>Активные курсы</h3>
+            <p class="stat-number">{{ enrollments|length }}</p>
+        </div>
+        <div class="stat-card">
+            <h3>Средняя оценка</h3>
+            <p class="stat-number">
+                {% with grades=enrollments.exclude(grade=None) %}
+                    {% if grades %}
+                        {{ grades|dictsort:"grade"|slice:":1"|first.grade|default:"-" }}
+                    {% else %}
+                        -
+                    {% endif %}
+                {% endwith %}
+            </p>
+        </div>
+    </div>
+
+    <div class="dashboard-content">
+        <h2>Мои курсы</h2>
+        {% if enrollments %}
+            <div class="courses-grid">
+                {% for enrollment in enrollments %}
+                    <div class="course-card">
+                        <h3>{{ enrollment.course.title }}</h3>
+                        <p><strong>Преподаватель:</strong> 
+                            {% if enrollment.course.instructor %}
+                                {{ enrollment.course.instructor.full_name }}
+                            {% else %}
+                                Не назначен
+                            {% endif %}
+                        </p>
+                        <p><strong>Статус:</strong> {{ enrollment.get_status_display }}</p>
+                        {% if enrollment.grade %}
+                            <p><strong>Оценка:</strong> {{ enrollment.grade }}</p>
+                        {% endif %}
+                        <a href="{% url 'course_detail' enrollment.course.slug %}" class="btn">Подробнее</a>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>Вы еще не записаны на курсы.</p>
+            <a href="{% url 'course_list' %}" class="btn btn-primary">Посмотреть доступные курсы</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

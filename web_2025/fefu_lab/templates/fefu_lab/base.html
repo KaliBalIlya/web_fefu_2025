@@ -12,12 +12,36 @@
         <nav class="navigation">
             <a href="{% url 'home' %}">Главная</a> | 
             <a href="{% url 'about' %}">О нас</a> | 
-            <a href="{% url 'student_list' %}">Студенты</a> | 
             <a href="{% url 'course_list' %}">Курсы</a> | 
-            <a href="{% url 'feedback' %}">Обратная связь</a> | 
-            <a href="{% url 'register' %}">Регистрация</a> |
-            <a href="{% url 'enrollment' %}">Запись на курс</a>
+            <a href="{% url 'student_list' %}">Студенты</a> |
+            <a href="{% url 'feedback' %}">Обратная связь</a> |
+            
+            {% if user.is_authenticated %}
+                {% if user.profile.role == 'TEACHER' or user.profile.role == 'ADMIN' %}
+                    <a href="{% url 'teacher_dashboard' %}">Дашборд</a> |
+                {% elif user.profile.role == 'STUDENT' %}
+                    <a href="{% url 'student_dashboard' %}">Дашборд</a> |
+                {% endif %}
+                <a href="{% url 'profile' %}">Профиль ({{ user.first_name }})</a> |
+                {% if user.is_staff or user.profile.role == 'ADMIN' %}
+                    <a href="/admin/">Админка</a> |
+                {% endif %}
+                <a href="{% url 'logout' %}">Выйти</a>
+            {% else %}
+                <a href="{% url 'login' %}">Вход</a> |
+                <a href="{% url 'register' %}">Регистрация</a>
+            {% endif %}
         </nav>
+
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
         
         <main>
             <h1>{% block heading %}{% endblock %}</h1>
