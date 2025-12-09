@@ -1,0 +1,41 @@
+[Unit]
+Description=FEFU Lab Gunicorn Daemon
+After=network.target postgresql.service
+Requires=postgresql.service
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/fefu_lab/web_2025
+Environment="PATH=/var/www/fefu_lab/venv/bin"
+Environment="DJANGO_SETTINGS_MODULE=web_2025.settings_production"
+Environment="DJANGO_SECRET_KEY=your-secret-key-change-in-production"
+Environment="DB_NAME=fefu_lab_db"
+Environment="DB_USER=fefu_user"
+Environment="DB_PASSWORD=your-strong-password-here"
+Environment="DB_HOST=localhost"
+Environment="DB_PORT=5432"
+
+ExecStart=/var/www/fefu_lab/venv/bin/gunicorn \
+    --config /var/www/fefu_lab/web_2025/deploy/gunicorn/config.py \
+    web_2025.wsgi:application
+
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s TERM $MAINPID
+PrivateTmp=true
+
+# Security
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/var/log/gunicorn /var/www/fefu_lab/web_2025/staticfiles /var/www/fefu_lab/web_2025/media
+ReadOnlyPaths=/
+
+# Logs
+StandardOutput=journal
+StandardError=journal
+
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target
